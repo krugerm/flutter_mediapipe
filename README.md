@@ -1,6 +1,7 @@
 # flutter_mediapipe
 
-[Flutter plugin](https://codelabs.developers.google.com/codelabs/write-flutter-plugin/#0) with [mediapipe facemesh](https://google.github.io/mediapipe/solutions/face_mesh). 
+[Flutter plugin](https://codelabs.developers.google.com/codelabs/write-flutter-plugin/#0) with 
+[mediapipe_posedetection](https://developers.google.com/mediapipe/solutions/vision/pose_landmarker).
 
 ## Devices
 Currently, it runs on below devices with "OK".
@@ -13,29 +14,18 @@ There are Mediapipe Manual Build for Android flutter plugin.
 
 There are [mobile_calculators](https://github.com/google/mediapipe/search?q=mobile_calculators) list to run on Mobile.
 
-Choose one. This plugin choose _**face_mesh**_.
+Choose one. This plugin choose _**pose_detection**_.
 - face_detection
-- _**face_mesh**_ 
+- face_mesh 
 - object_detection
+- _**pose_detection**_
+- pose_landmark
 - hand_tracking
-
-### [Docker](https://google.github.io/mediapipe/getting_started/install.html#installing-using-docker)
 
 ```
 git clone https://github.com/google/mediapipe.git
 cd mediapipe
-docker build --tag=mediapipe .
-docker run -it --name mediapipe mediapipe:latest
 ```
-
-When enter docker again:
-
-```
-docker start [your container ID] 
-docker exec -i -t mediapipe bash
-```
-
-Run below commands on the container.
 
 ### Setup
 ```
@@ -66,6 +56,7 @@ mediapipe_aar(
 bazel build -c opt --host_crosstool_top=@bazel_tools//tools/cpp:toolchain --fat_apk_cpu=arm64-v8a,armeabi-v7a --strip=ALWAYS //mediapipe/examples/android/src/java/com/google/mediapipe/apps/flutter_mediapipe:BUILD --linkopt="-s"
 bazel build -c opt --host_crosstool_top=@bazel_tools//tools/cpp:toolchain --fat_apk_cpu=arm64-v8a,armeabi-v7a //mediapipe/examples/android/src/java/com/google/mediapipe/apps/flutter_mediapipe:flutter_mediapipe --linkopt="-s"
 ```
+
 - binary graph
 ```
 bazel build -c opt --host_crosstool_top=@bazel_tools//tools/cpp:toolchain --fat_apk_cpu=arm64-v8a,armeabi-v7a --strip=ALWAYS //mediapipe/examples/android/src/java/com/google/mediapipe/apps/facemeshgpu:BUILD
@@ -85,7 +76,6 @@ mkdir flutter_mediapipe/protos
 ```
 
 ### libs
-
 ```
 cp bazel-bin/mediapipe/examples/android/src/java/com/google/mediapipe/apps/flutter_mediapipe/libflutter_mediapipe_android_lib.jar flutter_mediapipe/android/libs
 ```
@@ -95,11 +85,9 @@ cp bazel-bin/mediapipe/examples/android/src/java/com/google/mediapipe/apps/flutt
 cp mediapipe/modules/face_detection/face_detection_front.tflite flutter_mediapipe/android/src/main/assets
 cp mediapipe/modules/face_landmark/face_landmark.tflite flutter_mediapipe/android/src/main/assets
 cp bazel-out/k8-opt/bin/mediapipe/graphs/face_mesh/face_mesh_mobile_gpu.binarypb flutter_mediapipe/android/src/main/assets
-
 ```
 
 ### jniLibs
-
 ```
 mkdir work
 cp bazel-bin/mediapipe/examples/android/src/java/com/google/mediapipe/apps/flutter_mediapipe/flutter_mediapipe.aar work/aar.zip
@@ -108,21 +96,18 @@ unzip aar.zip
 cd ..
 cp -r work/jni/* flutter_mediapipe/android/src/main/jniLibs/
 ```
-### protos
 
+### protos
 ```
 cp mediapipe/framework/formats/landmark.proto flutter_mediapipe/protos/
 ```
+
 See [regenerate.md](../protos/regenerate.md)
 
 ### Zip
-
-
 ```
 zip -r flutter_mediapipe.zip flutter_mediapipe
 ```
-
-And then, exit from the container.
 
 ### Copy
 Change "3730fdc4d319" to your container ID.
@@ -150,17 +135,17 @@ flutter build apk --split-per-abi
 Not implemented. Help me to develop.
 
 
-## Custormize mediapipe
+## Customize mediapipe
 
 ### Graph
 When editing graphs or subgraphs, [Build](###Build) again. 
 - graphs: _binary graph_
 - subgraphs: _jniLibs_
 
-
 ```
 vi mediapipe/graphs/face_mesh/subgraphs/face_renderer_gpu.pbtxt
 ```
+
 It is a sample to comment out of lines from 92 to 94 for hiding rectangles and landmarks.
 ```
 # Draws annotations and overlays them on top of the input images.
@@ -181,6 +166,7 @@ When editing c++ calculator source, [Build](###Build) again.
 ```
 vi mediapipe/graphs/face_mesh/calculators/face_landmarks_to_render_data_calculator.cc
 ```
+
 It is a sample to comment out the lines(31 and 45) for hiding Left eyebrow connections.
 ```
 constexpr int kNumFaceLandmarkConnections = 116; // (124 - (16/2))  c.f. l.93
