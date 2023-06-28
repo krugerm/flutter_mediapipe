@@ -124,7 +124,7 @@ Then copy "flutter_mediapipe" to flutter plugin projects.
 flutter build apk --split-per-abi
 ```
 
-### Refferences
+### References
 - [sample plugin](https://github.com/zhouzaihang/flutter_hand_tracking_plugin) is useful.
 - [sample android app without flutter](https://github.com/jiuqiant/mediapipe_multi_hands_tracking_aar_example) 
 - [Flutter don't support local AAR](https://github.com/decodedhealth/flutter_zoom_plugin/issues/53)

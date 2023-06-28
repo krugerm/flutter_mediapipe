@@ -39,7 +39,9 @@ import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel;
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler;
 import io.flutter.plugin.common.MethodChannel.Result;
-import io.flutter.plugin.platform.PlatformView;
+import io.flutter.plugin.platform.PlatformView;import androidx.annotation.NonNull;
+import io.flutter.embedding.engine.plugins.FlutterPlugin;
+import android.util.Log;
 
 public class NativeView implements PlatformView, MethodCallHandler {
 
@@ -187,6 +189,7 @@ public class NativeView implements PlatformView, MethodCallHandler {
 
     @Override
     public void dispose() {
+        converter.close();
     }
 
     private void setupPreviewDisplayView(Activity activity) {

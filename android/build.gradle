@@ -8,7 +8,8 @@ buildscript {
     }
 
     dependencies {
-        classpath 'com.android.tools.build:gradle:4.1.0'
+        classpath 'com.android.tools.build:gradle:7.4.2'
+        //classpath 'com.android.tools.build:gradle:4.1.0'
     }
 }
 
@@ -22,10 +23,17 @@ rootProject.allprojects {
 apply plugin: 'com.android.library'
 
 android {
-    compileSdkVersion 30
+    compileSdkVersion 31
+    namespace 'co.sotai.flutter_mediapipe'
 
     defaultConfig {
         minSdkVersion 21
+    }
+
+    sourceSets {
+        main {
+            jniLibs.srcDirs 'src/main/jniLibs'
+        }
     }
 }
 

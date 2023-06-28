@@ -12,8 +12,12 @@ import io.flutter.plugin.platform.PlatformViewFactory;
 import java.util.Map;
 
 import io.flutter.plugin.common.StandardMessageCodec;
+import android.util.Log;
+
 
 public class NativeViewFactory extends PlatformViewFactory {
+
+  private static final String TAG = "FlutterMediapipePlugin";
 
   static {
     System.loadLibrary("mediapipe_jni");
