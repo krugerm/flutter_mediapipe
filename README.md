@@ -49,7 +49,7 @@ load("//mediapipe/java/com/google/mediapipe:mediapipe_aar.bzl", "mediapipe_aar")
 
 mediapipe_aar(
     name = "flutter_mediapipe",
-    calculators = ["//mediapipe/graphs/pose_tracking:mobile_calculators"],
+    calculators = ["//mediapipe/calculators/core:constant_side_packet_calculator","//mediapipe/calculators/core:flow_limiter_calculator"]
 )
 ```
 
