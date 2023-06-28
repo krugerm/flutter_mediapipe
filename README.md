@@ -1,5 +1,7 @@
 # flutter_mediapipe
 
+This plugin demonstrates how to use mediapipe projects in flutter.  The process is that we create a mediapipe project, configure it (including calculators, input, output, etc), compile the .so jniLibs to be included in the flutter project, and then create the flutter code which calls the plugin's native .java code which in turn wraps the jniLibs.
+
 [Flutter plugin](https://codelabs.developers.google.com/codelabs/write-flutter-plugin/#0) with 
 [mediapipe_posedetection](https://developers.google.com/mediapipe/solutions/vision/pose_landmarker).
 
@@ -18,8 +20,7 @@ Choose one. This plugin choose _**pose_detection**_.
 - face_detection
 - face_mesh 
 - object_detection
-- _**pose_detection**_
-- pose_landmark
+- _**pose_tracking**_
 - hand_tracking
 
 ```
@@ -36,31 +37,29 @@ bash ./setup_android_sdk_and_ndk.sh
 ```
 
 ### Prepare
+Find the calculators we want to use in ```mediapipe/graphs/pose_tracking/BUILD```, and them add them to the list to be included in the BUILD file:
 ```
 mkdir mediapipe/examples/android/src/java/com/google/mediapipe/apps/flutter_mediapipe
 vi mediapipe/examples/android/src/java/com/google/mediapipe/apps/flutter_mediapipe/BUILD 
 ```
+
 - "BUILD" file content.
 ```
 load("//mediapipe/java/com/google/mediapipe:mediapipe_aar.bzl", "mediapipe_aar")
 
 mediapipe_aar(
     name = "flutter_mediapipe",
-    calculators = ["//mediapipe/graphs/face_mesh:mobile_calculators"],
+    calculators = ["//mediapipe/calculators/core:constant_side_packet_calculator","//mediapipe/calculators/core:flow_limiter_calculator"]
 )
 ```
 
 ### Build
-- jniLibs
+- jniLibs & binary graphs (to be included in the flutter project's assets)
 ```
 bazel build -c opt --host_crosstool_top=@bazel_tools//tools/cpp:toolchain --fat_apk_cpu=arm64-v8a,armeabi-v7a --strip=ALWAYS //mediapipe/examples/android/src/java/com/google/mediapipe/apps/flutter_mediapipe:BUILD --linkopt="-s"
 bazel build -c opt --host_crosstool_top=@bazel_tools//tools/cpp:toolchain --fat_apk_cpu=arm64-v8a,armeabi-v7a //mediapipe/examples/android/src/java/com/google/mediapipe/apps/flutter_mediapipe:flutter_mediapipe --linkopt="-s"
-```
-
-- binary graph
-```
-bazel build -c opt --host_crosstool_top=@bazel_tools//tools/cpp:toolchain --fat_apk_cpu=arm64-v8a,armeabi-v7a --strip=ALWAYS //mediapipe/examples/android/src/java/com/google/mediapipe/apps/facemeshgpu:BUILD
-bazel build -c opt --host_crosstool_top=@bazel_tools//tools/cpp:toolchain --fat_apk_cpu=arm64-v8a,armeabi-v7a //mediapipe/examples/android/src/java/com/google/mediapipe/apps/facemeshgpu:facemeshgpu
+bazel build -c opt --host_crosstool_top=@bazel_tools//tools/cpp:toolchain --fat_apk_cpu=arm64-v8a,armeabi-v7a --strip=ALWAYS //mediapipe/examples/android/src/java/com/google/mediapipe/apps/posetrackinggpu:BUILD
+bazel build -c opt --host_crosstool_top=@bazel_tools//tools/cpp:toolchain --fat_apk_cpu=arm64-v8a,armeabi-v7a //mediapipe/examples/android/src/java/com/google/mediapipe/apps/posetrackinggpu:posetrackinggpu
 ```
 
 ### mkdir
@@ -80,11 +79,47 @@ mkdir flutter_mediapipe/protos
 cp bazel-bin/mediapipe/examples/android/src/java/com/google/mediapipe/apps/flutter_mediapipe/libflutter_mediapipe_android_lib.jar flutter_mediapipe/android/libs
 ```
 
+### download models using a download.gradle file
+download.gradle file lives in the android project.
+
+```
+task downloadTaskFile(type: Download) {
+    src 'https://storage.googleapis.com/mediapipe-models/pose_landmarker/pose_landmarker_heavy/float16/1/pose_landmarker_heavy.task'
+    dest project.ext.ASSET_DIR + '/pose_landmarker_heavy.task'
+    overwrite false
+}
+
+task downloadTaskFile1(type: Download) {
+    src 'https://storage.googleapis.com/mediapipe-models/pose_landmarker/pose_landmarker_full/float16/1/pose_landmarker_full.task'
+    dest project.ext.ASSET_DIR + '/pose_landmarker_full.task'
+    overwrite false
+}
+
+task downloadTaskFile2(type: Download) {
+    src 'https://storage.googleapis.com/mediapipe-models/pose_landmarker/pose_landmarker_lite/float16/1/pose_landmarker_lite.task'
+    dest project.ext.ASSET_DIR + '/pose_landmarker_lite.task'
+    overwrite false
+}
+
+preBuild.dependsOn downloadTaskFile, downloadTaskFile1, downloadTaskFile2
+```
+
+
 ### assets
 ```
-cp mediapipe/modules/face_detection/face_detection_front.tflite flutter_mediapipe/android/src/main/assets
-cp mediapipe/modules/face_landmark/face_landmark.tflite flutter_mediapipe/android/src/main/assets
-cp bazel-out/k8-opt/bin/mediapipe/graphs/face_mesh/face_mesh_mobile_gpu.binarypb flutter_mediapipe/android/src/main/assets
+curl -o flutter_mediapipe/android/src/main/assets/pose_landmarker_heavy.task https://storage.googleapis.com/mediapipe-models/pose_landmarker/pose_landmarker_full/float16/1/pose_landmarker_heavy.task
+
+curl -o flutter_mediapipe/android/src/main/assets/pose_landmarker_full.task https://storage.googleapis.com/mediapipe-models/pose_landmarker/pose_landmarker_full/float16/1/pose_landmarker_full.task
+
+curl -o flutter_mediapipe/android/src/main/assets/pose_landmarker_lite.task https://storage.googleapis.com/mediapipe-models/pose_landmarker/pose_landmarker_full/float16/1/pose_landmarker_lite.task
+
+cp mediapipe/modules/pose_detection/*.pbtxt flutter_mediapipe/android/src/main/assets/.
+cp mediapipe/modules/pose_landmark/*.pbtxt flutter_mediapipe/android/src/main/assets/.
+
+cp bazel-out/darwin_arm64-opt/bin/mediapipe/graphs/pose_tracking/pose_tracking_gpu.binarypb flutter_mediapipe/android/src/main/assets
+
+# potentially also copy the .binarypb files for different architectures?
+cp bazel-out/<architecture>/bin/mediapipe/graphs/pose_tracking/pose_tracking_gpu.binarypb flutter_mediapipe/android/src/main/assets
 ```
 
 ### jniLibs
@@ -104,20 +139,8 @@ cp mediapipe/framework/formats/landmark.proto flutter_mediapipe/protos/
 
 See [regenerate.md](../protos/regenerate.md)
 
-### Zip
-```
-zip -r flutter_mediapipe.zip flutter_mediapipe
-```
 
-### Copy
-Change "3730fdc4d319" to your container ID.
-
-```
-docker cp 3730fdc4d319:/mediapipe/flutter_mediapipe.zip .
-unzip flutter_mediapipe.zip
-```
-
-Then copy "flutter_mediapipe" to flutter plugin projects.
+Then copy "flutter_mediapipe" directory to flutter plugin projects.
 
 ### [APK](https://flutter.dev/docs/deployment/android#build-an-apk)
 ```
