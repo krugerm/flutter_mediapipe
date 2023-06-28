@@ -35,6 +35,7 @@ bash ./setup_android_sdk_and_ndk.sh
 ```
 
 ### Prepare
+Find the calculators we want to use in ```mediapipe/graphs/pose_tracking/BUILD```, and them add them to the list to be included in the BUILD file:
 ```
 mkdir mediapipe/examples/android/src/java/com/google/mediapipe/apps/flutter_mediapipe
 vi mediapipe/examples/android/src/java/com/google/mediapipe/apps/flutter_mediapipe/BUILD 
@@ -54,6 +55,7 @@ mediapipe_aar(
 - jniLibs
 ```
 bazel build -c opt --host_crosstool_top=@bazel_tools//tools/cpp:toolchain --fat_apk_cpu=arm64-v8a,armeabi-v7a --strip=ALWAYS //mediapipe/examples/android/src/java/com/google/mediapipe/apps/flutter_mediapipe:BUILD --linkopt="-s"
+
 bazel build -c opt --host_crosstool_top=@bazel_tools//tools/cpp:toolchain --fat_apk_cpu=arm64-v8a,armeabi-v7a //mediapipe/examples/android/src/java/com/google/mediapipe/apps/flutter_mediapipe:flutter_mediapipe --linkopt="-s"
 ```
 
