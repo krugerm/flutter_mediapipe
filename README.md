@@ -120,7 +120,10 @@ curl -o flutter_mediapipe/android/src/main/assets/pose_landmarker_lite.task http
 cp mediapipe/modules/pose_detection/*.pbtxt flutter_mediapipe/android/src/main/assets/.
 cp mediapipe/modules/pose_landmark/*.pbtxt flutter_mediapipe/android/src/main/assets/.
 
-# cp bazel-out/k8-opt/bin/mediapipe/graphs/face_mesh/face_mesh_mobile_gpu.binarypb flutter_mediapipe/android/src/main/assets
+cp bazel-out/darwin_arm64-opt/bin/mediapipe/graphs/pose_tracking/pose_tracking_gpu.binarypb flutter_mediapipe/android/src/main/assets
+
+# potentially also copy the .binarypb files for different architectures?
+cp bazel-out/<architecture>/bin/mediapipe/graphs/pose_tracking/pose_tracking_gpu.binarypb flutter_mediapipe/android/src/main/assets
 ```
 
 ### jniLibs
