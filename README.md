@@ -1,5 +1,7 @@
 # flutter_mediapipe
 
+This plugin demonstrates how to use mediapipe projects in flutter.  The process is that we create a mediapipe project, configure it (including calculators, input, output, etc), compile the .so jniLibs to be included in the flutter project, and then create the flutter code which calls the plugin's native .java code which in turn wraps the jniLibs.
+
 [Flutter plugin](https://codelabs.developers.google.com/codelabs/write-flutter-plugin/#0) with 
 [mediapipe_posedetection](https://developers.google.com/mediapipe/solutions/vision/pose_landmarker).
 
