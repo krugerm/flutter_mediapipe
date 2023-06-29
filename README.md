@@ -37,6 +37,20 @@ bash ./setup_android_sdk_and_ndk.sh
 ```
 
 ### Prepare
+Download the .tflite models required to compile the native binaries.  Links can be found in /docs/solutions/models.md
+*   Pose detection model:
+    [TFLite model](https://storage.googleapis.com/mediapipe-assets/pose_detection.tflite)
+*   Pose landmark model:
+    [TFLite model (lite)](https://storage.googleapis.com/mediapipe-assets/pose_landmark_lite.tflite),
+    [TFLite model (full)](https://storage.googleapis.com/mediapipe-assets/pose_landmark_full.tflite),
+    [TFLite model (heavy)](https://storage.googleapis.com/mediapipe-assets/pose_landmark_heavy.tflite)
+*   [Model card](https://mediapipe.page.link/blazepose-mc)
+*   For Holistic detection, also download the Hand recrop model:
+    [TFLite model](https://storage.googleapis.com/mediapipe-assets/hand_recrop.tflite)
+
+These files need to be put in mediapipe/modules/pose_detection/
+
+    
 Find the calculators we want to use in ```mediapipe/graphs/pose_tracking/BUILD```, and them add them to the list to be included in the BUILD file:
 ```
 mkdir mediapipe/examples/android/src/java/com/google/mediapipe/apps/flutter_mediapipe
@@ -49,7 +63,7 @@ load("//mediapipe/java/com/google/mediapipe:mediapipe_aar.bzl", "mediapipe_aar")
 
 mediapipe_aar(
     name = "flutter_mediapipe",
-    calculators = ["//mediapipe/calculators/core:constant_side_packet_calculator","//mediapipe/calculators/core:flow_limiter_calculator"]
+    calculators = ["//mediapipe/graphs/pose_tracking:pose_tracking_gpu_deps"]
 )
 ```
 
